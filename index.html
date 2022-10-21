@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Oleta Studio</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100;0,200;0,300;0,400;0,500;0,900;1,100;1,200;1,300;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    
+    <style>
+      body {
+      font-family: 'Archivo', sans-serif;
+      margin: 0;
+      padding: 0;
+      }
+
+      </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <main id="items" class="col-sm-8 row"></main>
+            <aside class="col-sm-4">
+                <h2>Presupuesto Articulos Sublimados</h2>
+                <ul id="presupuesto" class="list-group"></ul>
+                <hr>
+                <p class="text-right">Total: $ <span id="total"></span></p>
+                <button id="boton-vaciar" class="btn btn-danger">Vaciar</button>
+                <button id="boton-vaciar" class="btn btn-danger">Registrar Cotizacion</button>
+            </aside>
+        </div>
+    </div>
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+let articulosSublimacion = [
+  {
+    id: 0,
+    imagen:"./lata.jpg",
+    articulo: "Lata Termica",
+    precio: 150,
+    cant: 50,
+  },
+  {
+    id: 1,
+    imagen:"./tarro.jpg",
+    articulo: "Tarro Glaseado",
+    precio: 200,
+    cant: 50,
+  },
+  {
+    id: 2,
+    imagen:"./playera.jpg",
+    articulo: "Playera Poliester",
+    precio: 150,
+    cant: 80,
+  },
+  {
+    id: 3,
+    imagen:"./dulcero.jpg",
+    articulo: "Dulcero",
+    precio: 70,
+    cant: 80,
+  },
+  {
+    id: 4,
+    imagen:"./taza.jpg",
+    articulo: "Taza",
+    precio: 100,
+    cant: 350,
+  },
+  {
+    id: 5,
+    imagen:"./gorra.jpg",
+    articulo: "Gorra Trucker",
+    precio: 130,
+    cant: 120,
+  },
+  ];
+
+  let presupuesto = [];
+  let moneda= '$';
+  let DOMitems = document.querySelector('#items');
+  let DOMpresupuesto = document.querySelector('#presupuesto');
+  let DOMtotal = document.querySelector('#total');
+  let DOMbotonVaciar = document.querySelector('#boton-vaciar');
+
+// Mostrar los productos del array se crea la estructura del contenido 
+        function mostrarProductos() {
+            articulosSublimacion.forEach((info) => {
+                let miNodo = document.createElement('div');
+                miNodo.classList.add('card', 'col-sm-4');
+                let miNodoCardBody = document.createElement('div');
+                miNodoCardBody.classList.add('card-body');
+                let miNodoTitle = document.createElement('h5');
+                miNodoTitle.classList.add('card-title');
+                miNodoTitle.textContent = info.articulo;
+                let miNodoImagen = document.createElement('img');
+                miNodoImagen.classList.add('img-fluid');
+                miNodoImagen.setAttribute('src', info.imagen);
+                let miNodoPrecio = document.createElement('p');
+                miNodoPrecio.classList.add('card-text');
+                miNodoPrecio.textContent = `${moneda}${info.precio}`;
+                
+                let miNodoBoton = document.createElement('button');
+                miNodoBoton.classList.add('btn', 'btn-primary');
+                miNodoBoton.textContent = 'Añadir';
+                miNodoBoton.setAttribute('marcador', info.id);
+                miNodoBoton.addEventListener('click', agregarProductosAlPresupuesto);
+
+// Se inserta el contenido
+                miNodoCardBody.appendChild(miNodoImagen);
+                miNodoCardBody.appendChild(miNodoTitle);
+                miNodoCardBody.appendChild(miNodoPrecio);
+                miNodoCardBody.appendChild(miNodoBoton);
+                miNodo.appendChild(miNodoCardBody);
+                DOMitems.appendChild(miNodo);
+            });
+        }
+
+        function agregarProductosAlPresupuesto(evento) {
+             presupuesto.push(evento.target.getAttribute('marcador'))
+             mostrarPresupuesto();
+        }
+
+        function mostrarPresupuesto() {
+            DOMpresupuesto.textContent = '';
+            let presupuestoDeArticulos = [...new Set(presupuesto)];
+            presupuestoDeArticulos.forEach((item) => {
+                let miItem = articulosSublimacion.filter((itemBaseDatos) => {
+                    return itemBaseDatos.id === parseInt(item);
+                });
+                let numeroUnidadesItem = presupuesto.reduce((total, itemId) => {
+                    return itemId === item ? total += 1 : total;
+                }, 0);
+             
+                let miNodo = document.createElement('li');
+                miNodo.classList.add('list-group-item', 'text-right', 'mx-2');
+                miNodo.textContent = `${numeroUnidadesItem} - ${miItem[0].articulo} - ${moneda}${miItem[0].precio}`;
+// Boton para vaciar
+                let miBoton = document.createElement('button');
+                miBoton.classList.add('btn', 'btn-danger', 'mx-5');
+                miBoton.textContent = 'Eliminar';
+                miBoton.style.marginLeft = '1rem';
+                miBoton.dataset.item = item;
+                miBoton.addEventListener('click', borrarItemPresupuesto);
+
+                miNodo.appendChild(miBoton);
+                DOMpresupuesto.appendChild(miNodo);
+            });
+           DOMtotal.textContent = calcularTotal();
+        }
+
+        function borrarItemPresupuesto(evento) {
+            let id = evento.target.dataset.item;
+            presupuesto = presupuesto.filter((presupuestoId) => {
+                return presupuestoId !== id;
+            });
+            mostrarPresupuesto();
+        }
+
+        function calcularTotal() {
+            return presupuesto.reduce((total, item) => {
+                let miItem = articulosSublimacion.filter((itemBaseDatos) => {
+                    return itemBaseDatos.id === parseInt(item);
+                }); 
+                return total + miItem[0].precio;
+            }, 0).toFixed(2);
+        }
+
+        function vaciarPresupuesto() {
+            presupuesto = [];
+            mostrarPresupuesto();
+        }
+        DOMbotonVaciar.addEventListener('click', vaciarPresupuesto);
+
+        mostrarProductos();
+        mostrarPresupuesto();
+      });
+      
+  </script>
+
+</body>
+</html>
