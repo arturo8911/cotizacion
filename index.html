@@ -86,8 +86,7 @@ let articulosSublimacion = [
   let DOMpresupuesto = document.querySelector('#presupuesto');
   let DOMtotal = document.querySelector('#total');
   let DOMbotonVaciar = document.querySelector('#boton-vaciar');
-
-// Mostrar los productos del array se crea la estructura del contenido 
+ 
         function mostrarProductos() {
             articulosSublimacion.forEach((info) => {
                 let miNodo = document.createElement('div');
@@ -110,7 +109,6 @@ let articulosSublimacion = [
                 miNodoBoton.setAttribute('marcador', info.id);
                 miNodoBoton.addEventListener('click', agregarProductosAlPresupuesto);
 
-// Se inserta el contenido
                 miNodoCardBody.appendChild(miNodoImagen);
                 miNodoCardBody.appendChild(miNodoTitle);
                 miNodoCardBody.appendChild(miNodoPrecio);
@@ -139,7 +137,7 @@ let articulosSublimacion = [
                 let miNodo = document.createElement('li');
                 miNodo.classList.add('list-group-item', 'text-right', 'mx-2');
                 miNodo.textContent = `${numeroUnidadesItem} - ${miItem[0].articulo} - ${moneda}${miItem[0].precio}`;
-// Boton para vaciar
+
                 let miBoton = document.createElement('button');
                 miBoton.classList.add('btn', 'btn-danger', 'mx-5');
                 miBoton.textContent = 'Eliminar';
